@@ -1,28 +1,44 @@
 ﻿// See https://aka.ms/new-console-template for more information
+using ProgramSelector;
 using System.Diagnostics;
 using System.Reflection.PortableExecutable;
 
-Console.WriteLine("Hello! Which Image do you want to see?");
-
-string[] list = File.ReadAllLines("directories.txt");
-
-for (int i = 0; i < list.Length; i++)
+class Program
 {
-    Console.WriteLine((i + 1) + ". " + list[i].Split(@"\")[list[i].Split(@"\").Length - 1]);
+    static void Main(string[] args)
+    {
+        Console.WriteLine("Hello! Which Program do you want to see?");
+
+        string[] list = EncryptionDecryption.RetrieveDirectories().Split("\n");
+        for (int i = 0; i < list.Length; i++)
+        {
+            Console.WriteLine(i + 1 + ". " + list[i].Split(@"\")[^1]);
+        }
+        Console.WriteLine("new. Add Directory");
+
+
+        //var choice = Int32.Parse(Console.ReadLine());
+        var choice = Console.ReadLine();
+        if (int.TryParse(choice, out _))
+        {
+            int choiceTemp = Int32.Parse(choice);
+            Process p = new();
+            ProcessStartInfo pi = new()
+            {
+                UseShellExecute = true,
+                FileName = list[choiceTemp - 1]
+            };
+            p.StartInfo = pi;
+
+            p.Start();
+        }
+        else if (choice == "new")
+        {
+            Console.WriteLine("paste directory");
+            EncryptionDecryption.AddDirectories(Console.ReadLine());
+        }
+    }
 }
-
-var choice = Int32.Parse(Console.ReadLine());
-
-
-
-Process p = new Process();
-ProcessStartInfo pi = new ProcessStartInfo();
-pi.UseShellExecute = true;
-pi.FileName = list[choice - 1];
-p.StartInfo = pi;
-
-p.Start();
-
 
 
 
