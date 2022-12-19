@@ -34,8 +34,12 @@ class Program
         }
         else if (choice == "new")
         {
-            Console.WriteLine("paste directory");
-            EncryptionDecryption.AddDirectories(Console.ReadLine());
+            Console.Write("Password: ");
+            if (Array.Exists(Passwords.userPasswords, element => element == Console.ReadLine()))
+            {
+                Console.WriteLine("paste directory");
+                EncryptionDecryption.AddDirectories(Console.ReadLine());
+            }
         }
     }
 }

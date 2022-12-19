@@ -15,10 +15,17 @@ namespace ProgramSelector
         {
             //directory = directory.Replace(@"\", "z");
             string directories = RetrieveDirectories();
-            //directories = directories.Replace(@"\", "z");
-            //directories = directories.Replace("\n", "Z");
 
-            string encrypted = stringEncryption.Encrypt((directories + "\n" + directory), "hacktheegg");
+            string encrypted;
+            if (directories == "")
+            {
+                encrypted = stringEncryption.Encrypt((directories + directory), "hacktheegg");
+            }
+            else
+            {
+                encrypted = stringEncryption.Encrypt((directories + "\n" + directory), "hacktheegg");
+            }
+
 
             StreamWriter sw = new("directories");
             sw.WriteLine(encrypted);
@@ -27,9 +34,14 @@ namespace ProgramSelector
 
         public static string RetrieveDirectories()
         {
+            using (StreamWriter w = File.AppendText("directories"))
+            {
+            }
+
             string temp = File.ReadAllText("directories");
 
-            if (!string.IsNullOrEmpty(temp)) {
+            if (!string.IsNullOrEmpty(temp))
+            {
                 string directories = stringEncryption.Decrypt(temp, "hacktheegg");
                 //directories = directories.Replace("Z", "\n");
 
