@@ -43,7 +43,6 @@ namespace ProgramSelector
             if (!string.IsNullOrEmpty(temp))
             {
                 string directories = stringEncryption.Decrypt(temp, "hacktheegg");
-                //directories = directories.Replace("Z", "\n");
 
                 return directories;
             }
