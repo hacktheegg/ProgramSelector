@@ -1,6 +1,7 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using ProgramSelector;
 using System.Diagnostics;
+using System.IO;
 using System.Reflection.PortableExecutable;
 using System.Runtime.CompilerServices;
 
@@ -24,6 +25,9 @@ class Program
         {
             Console.WriteLine("Hello! Which Program do you want to see?");
             RandomFunctions.printPage(pageNo);
+            Console.WriteLine("8. back");
+            Console.WriteLine("9. forward");
+            Console.WriteLine("page " + (pageNo + 1)+ " out of " + ((list.Length / 7) + 1));
 
             ConsoleKeyInfo keyInfo = Console.ReadKey();
             char key = keyInfo.KeyChar;
@@ -57,7 +61,7 @@ class Program
                     ProcessStartInfo pi = new()
                     {
                         UseShellExecute = true,
-                        FileName = list[int.Parse(key.ToString()) + (pageNo * 7)]
+                        FileName = list[int.Parse(key.ToString()) + (pageNo * 7) - 1]
                     };
                     p.StartInfo = pi;
 
@@ -76,40 +80,125 @@ class Program
                     element => element == inputPassword))
                 {
                     System.Environment.Exit(1);
+                } else if (Array.Exists(Passwords.userPasswords, element => element == inputPassword))
+                {
+                    adminMenu(inputPassword);
                 }
             }
             Console.Clear();
         }
-
-
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        //var choice = Int32.Parse(Console.ReadLine());
-        /*var choice = Console.ReadLine();
-        if (int.TryParse(choice, out _))
-        {
-            int choiceTemp = Int32.Parse(choice);
-            Process p = new();
-            ProcessStartInfo pi = new()
-            {
-                UseShellExecute = true,
-                FileName = list[choiceTemp - 1]
-            };
-            p.StartInfo = pi;
-
-            p.Start();
-        }
-        else if (choice == "new")
-        {
-            Console.Write("Password: ");
-            if (Array.Exists(Passwords.userPasswords, element => element == Console.ReadLine()))
-            {
-                Console.WriteLine("paste directory");
-                EncryptionDecryption.AddDirectories(Console.ReadLine());
-            }
-        }*/
     }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    public static void adminMenu(string inputPassword)
+    {
+        Console.WriteLine("WELCOME TO THE ADMIN MENU");
+        Console.WriteLine("new");
+
+        bool masterPassword = inputPassword == Passwords.userPasswords[0];
+
+        if (masterPassword)
+        {
+            Console.WriteLine("delete");
+        }
+        Console.WriteLine();
+        string option = Console.ReadLine();
+
+        if (option == "new")
+        {
+            Console.WriteLine("paste directory (without quotes)");
+            EncryptionDecryption.AddDirectories(Console.ReadLine());
+
+        }
+        else if (option == "delete" && masterPassword)
+        {
+            string[] list = EncryptionDecryption.RetrieveDirectories().Split("\n");
+
+            bool answer = false;
+            int pageNo = 0;
+
+            while (!answer)
+            {
+                Console.WriteLine("Hello! Which Program do you want to delete?");
+                RandomFunctions.printPage(pageNo);
+                Console.WriteLine("8. back");
+                Console.WriteLine("9. forward");
+                Console.WriteLine("page " + (pageNo + 1) + " out of " + ((list.Length / 7) + 1));
+
+                ConsoleKeyInfo keyInfo = Console.ReadKey();
+                char key = keyInfo.KeyChar;
+
+                if (char.IsDigit(key))
+                {
+                    if (key.ToString() == "8")
+                    {
+                        if (pageNo == 0)
+                        {
+                            pageNo = RandomFunctions.round((float)(list.Length / 7));
+                        }
+                        else
+                        {
+                            pageNo--;
+                        }
+                    }
+                    else if (key.ToString() == "9")
+                    {
+                        if ((pageNo * 7) + 8 > list.Length)
+                        {
+                            pageNo = 0;
+                        }
+                        else
+                        {
+                            pageNo++;
+                        }
+                    }
+                    else
+                    {
+                        answer = true;
+                        List<string> DirectoryList = new List<string>(list);
+                        DirectoryList.RemoveAt(int.Parse(key.ToString()) + (pageNo * 7) - 1);
+                        //list[int.Parse(key.ToString()) + (pageNo * 7)];
+
+                        //list = string.Join("\n", DirectoryList);
+                        File.WriteAllText("directories", stringEncryption.Encrypt
+                            (string.Join("\n", DirectoryList), "hacktheegg"));
+
+                        //stringEncryption.Encrypt((directories + directory), "hacktheegg");
+                    }
+                }
+            }
+        }
+    }
+
+    /*else if (choice == "new")
+    {
+        Console.Write("Password: ");
+        if (Array.Exists(Passwords.userPasswords, element => element == Console.ReadLine()))
+        {
+            Console.WriteLine("paste directory");
+            EncryptionDecryption.AddDirectories(Console.ReadLine());
+        }
+    }*/
+
+
+    //var choice = Int32.Parse(Console.ReadLine());
+    /*var choice = Console.ReadLine();
+    if (int.TryParse(choice, out _))
+    {
+        int choiceTemp = Int32.Parse(choice);
+        Process p = new();
+        ProcessStartInfo pi = new()
+        {
+            UseShellExecute = true,
+            FileName = list[choiceTemp - 1]
+        };
+        p.StartInfo = pi;
+
+        p.Start();
+    }*/
 }
 
 

@@ -32,5 +32,10 @@ namespace ProgramSelector
         {
             return (int)(number - (number % 1));
         }
+
+        public static void RecompileDirectories()
+        {
+
+        }
     }
 }
