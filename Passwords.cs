@@ -8,11 +8,10 @@ namespace ProgramSelector
 {
     public class Passwords
     {
-        public static string[] userPasswords =
+        public class AdminUser
         {
-            "user1",
-            "user2",
-            "user3"
-        };
+            public string[] userPasswords { get; set; }
+            public string[] ownedLibrary { get; set; }
+        }
     }
 }

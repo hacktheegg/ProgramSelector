@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection.PortableExecutable;
 using System.Runtime.CompilerServices;
+using static ProgramSelector.Passwords;
 
 class Program
 {
@@ -76,11 +77,14 @@ class Program
                 Console.Write("Password: ");
                 string inputPassword = Console.ReadLine();
 
-                if (inputPassword != "back" && !Array.Exists(Passwords.userPasswords,
+                Passwords.AdminUser adminUser = new Passwords.AdminUser();
+                adminUser.userPasswords = new string[] { "user1", "user2", "user3" };
+
+                if (inputPassword != "back" && !Array.Exists(adminUser.userPasswords,
                     element => element == inputPassword))
                 {
                     System.Environment.Exit(1);
-                } else if (Array.Exists(Passwords.userPasswords, element => element == inputPassword))
+                } else if (Array.Exists(adminUser.userPasswords, element => element == inputPassword))
                 {
                     adminMenu(inputPassword);
                 }
@@ -95,20 +99,29 @@ class Program
 
     public static void adminMenu(string inputPassword)
     {
-        Console.WriteLine("WELCOME TO THE ADMIN MENU");
-        Console.WriteLine("new");
+        Console.Clear();
 
-        bool masterPassword = inputPassword == Passwords.userPasswords[0];
+        RandomFunctions.printAdminMenu();
+        Console.WriteLine();
+        Console.WriteLine("options:");
+        Console.WriteLine("  new");
+
+        Passwords.AdminUser adminUser = new Passwords.AdminUser();
+        adminUser.userPasswords = new string[] { "user1", "user2", "user3" };
+        adminUser.ownedLibrary = new string[] { "libraryPlaceholder", "libraryAlpha", "libraryBeta" };
+
+        bool masterPassword = inputPassword == adminUser.userPasswords[0];
 
         if (masterPassword)
         {
-            Console.WriteLine("delete");
+            Console.WriteLine("  delete");
         }
         Console.WriteLine();
         string option = Console.ReadLine();
 
         if (option == "new")
         {
+            Console.Clear();
             Console.WriteLine("paste directory (without quotes)");
             EncryptionDecryption.AddDirectories(Console.ReadLine());
 
@@ -122,6 +135,8 @@ class Program
 
             while (!answer)
             {
+                
+                Console.Clear();
                 Console.WriteLine("Hello! Which Program do you want to delete?");
                 RandomFunctions.printPage(pageNo);
                 Console.WriteLine("8. back");
