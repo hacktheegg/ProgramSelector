@@ -10,12 +10,6 @@ class Program
 {
     static void Main(string[] args)
     {
-        //Console.WriteLine("Hello! Which Program do you want to see?");
-        //for (int i = 0; i < list.Length; i++)
-        //{
-        //    Console.WriteLine(i + 1 + ". " + list[i].Split(@"\")[^1]);
-        //}
-        //Console.WriteLine("new. Add Directory");
 
         string[] list = EncryptionDecryption.RetrieveDirectories().Split("\n");
 

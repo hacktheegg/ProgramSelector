@@ -8,6 +8,7 @@ namespace ProgramSelector
     {
         public static string Encrypt(string plainText, string password)
         {
+
             byte[] plainTextBytes = System.Text.Encoding.UTF8.GetBytes(plainText);
             byte[] saltBytes = GetRandomBytes(8);
             byte[] encryptedBytes;

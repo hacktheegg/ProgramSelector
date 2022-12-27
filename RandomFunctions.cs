@@ -10,6 +10,7 @@ namespace ProgramSelector
     {
         public static void printPage(int pageNo)
         {
+
             string[] list = EncryptionDecryption.RetrieveDirectories().Split("\n");
 
             if (((pageNo * 7) + 7) <= list.Length)

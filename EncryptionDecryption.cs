@@ -13,6 +13,7 @@ namespace ProgramSelector
     {
         public static void AddDirectories(string directory)
         {
+
             //directory = directory.Replace(@"\", "z");
             string directories = RetrieveDirectories();
 

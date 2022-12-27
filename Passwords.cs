@@ -11,6 +11,7 @@ namespace ProgramSelector
         public class AdminUser
         {
             public string[] userPasswords { get; set; }
+
             public string[] ownedLibrary { get; set; }
         }
     }
