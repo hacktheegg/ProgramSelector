@@ -1,5 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using ProgramSelector;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection.PortableExecutable;
@@ -10,19 +11,49 @@ class Program
 {
     static void Main(string[] args)
     {
+        string folderPath = "data";
 
-        string[] list = EncryptionDecryption.RetrieveDirectories().Split("\n");
+        if (!System.IO.Directory.Exists(folderPath))
+        {
+            System.IO.Directory.CreateDirectory(folderPath);
+        }
+
+        string[] previousLibraries = Array.Empty<string>();
+        string whichLibrary = @"data\main.gml";
+
+        ChooseProgram(previousLibraries, whichLibrary);
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    public static void ChooseProgram(string[] previousLibraries, string whichLibrary)
+    {
+        string[] list = EncryptionDecryption.RetrieveDirectories(whichLibrary).Split("\n");
 
         bool answer = false;
         int pageNo = 0;
 
         while (!answer)
         {
-            Console.WriteLine("Hello! Which Program do you want to see?");
-            RandomFunctions.printPage(pageNo);
+            list = EncryptionDecryption.RetrieveDirectories(whichLibrary).Split("\n");
+
+            Console.Clear();
+
+            if (previousLibraries == Array.Empty<string>())
+            {
+                Console.WriteLine("Hello! You are in " + whichLibrary.Split(".")[0] + ". Which Program do you want to see?");
+            } else
+            {
+                Console.WriteLine("Hello! You are in " + string.Join(@"\", previousLibraries) + ". Which Program do you want to see?");
+            }
+
+            RandomFunctions.printPage(pageNo, whichLibrary);
             Console.WriteLine("8. back");
             Console.WriteLine("9. forward");
-            Console.WriteLine("page " + (pageNo + 1)+ " out of " + ((list.Length / 7) + 1));
+            Console.WriteLine("page " + (pageNo + 1) + " out of " + ((list.Length / 7) + 1));
+            Console.WriteLine("\n" + whichLibrary);
 
             ConsoleKeyInfo keyInfo = Console.ReadKey();
             char key = keyInfo.KeyChar;
@@ -34,7 +65,8 @@ class Program
                     if (pageNo == 0)
                     {
                         pageNo = RandomFunctions.round((float)(list.Length / 7));
-                    } else
+                    }
+                    else
                     {
                         pageNo--;
                     }
@@ -44,23 +76,35 @@ class Program
                     if ((pageNo * 7) + 8 > list.Length)
                     {
                         pageNo = 0;
-                    } else
+                    }
+                    else
                     {
                         pageNo++;
                     }
                 }
                 else
                 {
-                    answer = true;
-                    Process p = new();
-                    ProcessStartInfo pi = new()
+                    if (list[(pageNo*7) + int.Parse(key.ToString()) - 1].Split(@".")[^1] == "gml")
                     {
-                        UseShellExecute = true,
-                        FileName = list[int.Parse(key.ToString()) + (pageNo * 7) - 1]
-                    };
-                    p.StartInfo = pi;
+                        Array.Resize(ref previousLibraries, previousLibraries.Length + 1);
+                        previousLibraries[previousLibraries.Length - 1] = list[(pageNo * 7) + int.Parse(key.ToString()) - 1].Split(@"\")[^1].Split(".")[^2];
 
-                    p.Start();
+                        whichLibrary = list[(pageNo * 7) + int.Parse(key.ToString()) - 1];
+
+                        ChooseProgram(previousLibraries, whichLibrary);
+                    } else
+                    {
+                        answer = true;
+                        Process p = new();
+                        ProcessStartInfo pi = new()
+                        {
+                            UseShellExecute = true,
+                            FileName = list[int.Parse(key.ToString()) + (pageNo * 7) - 1]
+                        };
+                        p.StartInfo = pi;
+
+                        p.Start();
+                    }
                 }
             }
             else
@@ -73,14 +117,30 @@ class Program
 
                 Passwords.AdminUser adminUser = new Passwords.AdminUser();
                 adminUser.userPasswords = new string[] { "user1", "user2", "user3" };
+                adminUser.ownedLibrary = new string[][] {
+                    new string[] { "libraryPlaceholder" },
+                    new string[] { "libraryAlpha", "libraryBeta" },
+                    new string[] { "libraryGamma", "libraryDelta" }
+                };
 
                 if (inputPassword != "back" && !Array.Exists(adminUser.userPasswords,
                     element => element == inputPassword))
                 {
                     System.Environment.Exit(1);
-                } else if (Array.Exists(adminUser.userPasswords, element => element == inputPassword))
+                }
+                else if (Array.Exists(adminUser.userPasswords, element => element == inputPassword))
                 {
-                    adminMenu(inputPassword);
+                    int index = Array.FindIndex(adminUser.userPasswords, element => element == inputPassword);
+
+                    if ((index == 0) || (previousLibraries == Array.Empty<string>()) || Array.Exists(adminUser.ownedLibrary[index], element => element == previousLibraries[0]))
+                    {
+                        adminMenu(inputPassword, whichLibrary);
+
+                    } else
+                    {
+                        Console.WriteLine("password not valid for library");
+                        Console.ReadKey();
+                    }
                 }
             }
             Console.Clear();
@@ -91,7 +151,7 @@ class Program
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    public static void adminMenu(string inputPassword)
+    public static void adminMenu(string inputPassword, string whichLibrary)
     {
         Console.Clear();
 
@@ -102,8 +162,12 @@ class Program
 
         Passwords.AdminUser adminUser = new Passwords.AdminUser();
         adminUser.userPasswords = new string[] { "user1", "user2", "user3" };
-        adminUser.ownedLibrary = new string[] { "libraryPlaceholder", "libraryAlpha", "libraryBeta" };
-
+        adminUser.ownedLibrary = new string[][] {
+            new string[] { "libraryPlaceholder" },
+            new string[] { "libraryAlpha", "libraryBeta" },
+            new string[] { "libraryGamma", "libraryDelta" }
+        };
+    
         bool masterPassword = inputPassword == adminUser.userPasswords[0];
 
         if (masterPassword)
@@ -117,12 +181,12 @@ class Program
         {
             Console.Clear();
             Console.WriteLine("paste directory (without quotes)");
-            EncryptionDecryption.AddDirectories(Console.ReadLine());
+            EncryptionDecryption.AddDirectories(Console.ReadLine(), whichLibrary);
 
         }
         else if (option == "delete" && masterPassword)
         {
-            string[] list = EncryptionDecryption.RetrieveDirectories().Split("\n");
+            string[] list = EncryptionDecryption.RetrieveDirectories(whichLibrary).Split("\n");
 
             bool answer = false;
             int pageNo = 0;
@@ -132,7 +196,7 @@ class Program
                 
                 Console.Clear();
                 Console.WriteLine("Hello! Which Program do you want to delete?");
-                RandomFunctions.printPage(pageNo);
+                RandomFunctions.printPage(pageNo, whichLibrary);
                 Console.WriteLine("8. back");
                 Console.WriteLine("9. forward");
                 Console.WriteLine("page " + (pageNo + 1) + " out of " + ((list.Length / 7) + 1));

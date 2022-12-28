@@ -8,23 +8,25 @@ namespace ProgramSelector
 {
     public class RandomFunctions
     {
-        public static void printPage(int pageNo)
+        public static void printPage(int pageNo, string whichLibrary)
         {
 
-            string[] list = EncryptionDecryption.RetrieveDirectories().Split("\n");
+            string[] list = EncryptionDecryption.RetrieveDirectories(whichLibrary).Split("\n");
 
             if (((pageNo * 7) + 7) <= list.Length)
             {
                 for (int i = 0; i < 7; i++)
                 {
-                    Console.WriteLine((i + 1) + ". " + list[i + (pageNo * 7)].Split(@"\")[^1]);
+                    Console.WriteLine((i + 1) + ". " + list[i + (pageNo * 7)]);
+                    //.Split(@"\")[^1]
                 }
             }
             else if (((pageNo * 7) + 7) > list.Length)
             {
                 for (int i = 0; i < (list.Length % 7); i++)
                 {
-                    Console.WriteLine((i + 1) + ". " + list[i + (pageNo * 7)].Split(@"\")[^1]);
+                    Console.WriteLine((i + 1) + ". " + list[i + (pageNo * 7)]);
+                    //.Split(@"\")[^1]
                 }
             }
         }
@@ -32,11 +34,6 @@ namespace ProgramSelector
         public static int round(float number)
         {
             return (int)(number - (number % 1));
-        }
-
-        public static void RecompileDirectories()
-        {
-
         }
 
         public static void printAdminMenu()

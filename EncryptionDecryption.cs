@@ -11,11 +11,11 @@ namespace ProgramSelector
 {
     class EncryptionDecryption
     {
-        public static void AddDirectories(string directory)
+        public static void AddDirectories(string directory, string whichLibrary)
         {
 
             //directory = directory.Replace(@"\", "z");
-            string directories = RetrieveDirectories();
+            string directories = RetrieveDirectories(whichLibrary);
 
             string encrypted;
             if (directories == "")
@@ -28,18 +28,18 @@ namespace ProgramSelector
             }
 
 
-            StreamWriter sw = new("directories");
+            StreamWriter sw = new(whichLibrary);
             sw.WriteLine(encrypted);
             sw.Close();
         }
 
-        public static string RetrieveDirectories()
+        public static string RetrieveDirectories(string whichLibrary)
         {
-            using (StreamWriter w = File.AppendText("directories"))
+            using (StreamWriter w = File.AppendText(whichLibrary))
             {
             }
 
-            string temp = File.ReadAllText("directories");
+            string temp = File.ReadAllText(whichLibrary);
 
             if (!string.IsNullOrEmpty(temp))
             {
