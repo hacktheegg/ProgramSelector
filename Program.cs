@@ -6,44 +6,60 @@ using System.IO;
 using System.Reflection.PortableExecutable;
 using System.Runtime.CompilerServices;
 using static ProgramSelector.Passwords;
+using System.Data.SQLite;
+using System.Collections.Generic;
 
 class Program
 {
     static void Main(string[] args)
     {
         string folderPath = "data";
-
         if (!System.IO.Directory.Exists(folderPath))
         {
             System.IO.Directory.CreateDirectory(folderPath);
         }
 
+        string filePath = @"data\GameDirectories.db";
+        if (!System.IO.File.Exists(filePath))
+        {
+            string connectionString = "Data Source=" + filePath + ";Version=3;";
+            SQLiteConnection connection = new SQLiteConnection(connectionString);
+            connection.Open();
+
+            string query = "CREATE TABLE Directories (id INTEGER, main TEXT)";
+            SQLiteCommand command = new SQLiteCommand(query, connection);
+            command.ExecuteNonQuery();
+            connection.Close();
+        }
+
         string[] previousLibraries = Array.Empty<string>();
-        string whichLibrary = @"data\main.gml";
+        string[] whichLibrary = { "Directories", "main" };
 
         ChooseProgram(previousLibraries, whichLibrary);
-    }
+
+        //@"C:\Windows\write.exe"
+    }  
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    public static void ChooseProgram(string[] previousLibraries, string whichLibrary)
+    public static void ChooseProgram(string[] previousLibraries, string[] whichLibrary)
     {
-        string[] list = EncryptionDecryption.RetrieveDirectories(whichLibrary).Split("\n");
+        string[] list = EncryptionDecryption.RetrieveDirectories(whichLibrary);
 
         bool answer = false;
         int pageNo = 0;
 
         while (!answer)
         {
-            list = EncryptionDecryption.RetrieveDirectories(whichLibrary).Split("\n");
+            list = EncryptionDecryption.RetrieveDirectories(whichLibrary);
 
             Console.Clear();
 
             if (previousLibraries == Array.Empty<string>())
             {
-                Console.WriteLine("Hello! You are in " + whichLibrary.Split(".")[0] + ". Which Program do you want to see?");
+                Console.WriteLine("Hello! You are in " + whichLibrary[1] + ". Which Program do you want to see?");
             } else
             {
                 Console.WriteLine("Hello! You are in " + string.Join(@"\", previousLibraries) + ". Which Program do you want to see?");
@@ -84,14 +100,15 @@ class Program
                 }
                 else
                 {
-                    if (list[(pageNo*7) + int.Parse(key.ToString()) - 1].Split(@".")[^1] == "gml")
+                    if (list[(pageNo*7) + int.Parse(key.ToString()) - 1].StartsWith("#"))
                     {
                         Array.Resize(ref previousLibraries, previousLibraries.Length + 1);
                         previousLibraries[previousLibraries.Length - 1] = list[(pageNo * 7) + int.Parse(key.ToString()) - 1].Split(@"\")[^1].Split(".")[^2];
 
-                        whichLibrary = list[(pageNo * 7) + int.Parse(key.ToString()) - 1];
+                        whichLibrary[1] = list[(pageNo * 7) + int.Parse(key.ToString()) - 1];
 
                         ChooseProgram(previousLibraries, whichLibrary);
+                    
                     } else
                     {
                         answer = true;
@@ -134,7 +151,39 @@ class Program
 
                     if ((index == 0) || (previousLibraries == Array.Empty<string>()) || Array.Exists(adminUser.ownedLibrary[index], element => element == previousLibraries[0]))
                     {
-                        adminMenu(inputPassword, whichLibrary);
+                        //adminMenu(inputPassword, whichLibrary);
+
+                        string[] tempList =
+                        {
+                            @"d\d1",
+                            @"d\d2",
+                            @"c\c1",
+                            @"c\c2",
+                            @"c\c3",
+                            @"c\c4",
+                            @"c\c5",
+                            @"c\c6",
+                            @"c\c7",
+                            @"b\b1",
+                            @"b\b2",
+                            @"b\b3",
+                            @"b\b4",
+                            @"b\b5",
+                            @"b\b6",
+                            @"b\b7",
+                            @"a\a1",
+                            @"a\a2",
+                            @"a\a3",
+                            @"a\a4",
+                            @"a\a5",
+                            @"a\a6",
+                            @"a\a7"
+                        };
+
+                        EncryptionDecryption.SortDirectories(whichLibrary, tempList);
+
+                        Console.WriteLine("admin menu requested");
+                        Console.ReadKey();
 
                     } else
                     {
@@ -151,7 +200,7 @@ class Program
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    public static void adminMenu(string inputPassword, string whichLibrary)
+    public static void adminMenu(string inputPassword, string[] whichLibrary)
     {
         Console.Clear();
 
@@ -186,7 +235,7 @@ class Program
         }
         else if (option == "delete" && masterPassword)
         {
-            string[] list = EncryptionDecryption.RetrieveDirectories(whichLibrary).Split("\n");
+            string[] list = EncryptionDecryption.RetrieveDirectories(whichLibrary);
 
             bool answer = false;
             int pageNo = 0;

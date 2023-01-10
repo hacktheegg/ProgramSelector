@@ -8,10 +8,10 @@ namespace ProgramSelector
 {
     public class RandomFunctions
     {
-        public static void printPage(int pageNo, string whichLibrary)
+        public static void printPage(int pageNo, string[] whichLibrary)
         {
 
-            string[] list = EncryptionDecryption.RetrieveDirectories(whichLibrary).Split("\n");
+            string[] list = EncryptionDecryption.RetrieveDirectories(whichLibrary);
 
             if (((pageNo * 7) + 7) <= list.Length)
             {
